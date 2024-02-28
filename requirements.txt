@@ -1,0 +1,5 @@
+requests==2.26.0
+Django==4.2
+djangorestframework==3.12.4
+PyJWT==2.1.0
+djangorestframework-simplejwt==4.7.2
