@@ -1,18 +1,14 @@
-from rest_framework import status, viewsets, mixins, generics
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from django.db.models import Count
+from rest_framework import mixins, status, viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from rest_framework.response import Response
 
 from api.permissions import AdminOrReadOnly
-from product.models import Product, Lesson, Group, AccessUser
-from api.serializers import (
-    ProductListSerializer,
-    ProductAddSerializer,
-    GroupSerializer,
-    UserBuyAccessSerializer,
-    LessonSerializer
-    )
+from api.serializers import (GroupSerializer, LessonSerializer,
+                             ProductAddSerializer, ProductListSerializer,
+                             UserBuyAccessSerializer)
+from product.models import AccessUser, Group, Lesson, Product
 
 
 class ProductViewSet(viewsets.ModelViewSet):

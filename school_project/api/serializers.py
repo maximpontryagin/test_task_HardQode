@@ -1,8 +1,8 @@
-from rest_framework import serializers
-from django.utils import timezone
-
-from product.models import Product, Lesson, Group, AccessUser
 from django.db.models import Count
+from django.utils import timezone
+from rest_framework import serializers
+
+from product.models import AccessUser, Group, Lesson, Product
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -32,31 +32,15 @@ class ProductAddSerializer(serializers.ModelSerializer):
             )
         return data
 
+
 class GroupSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания групп администартором"""
 
     class Meta:
         model = Group
         fields = ('title', 'product')
 
-    # def validate(self, data):
-    #     groups = Group.objects.filter(product=data.get('product'))
-    #     for group in groups:
-    #         if group.users == data.get('users')[0]:
-    #             raise Exception('Данный пользователь уже находится'
-    #                             'в другой группе по этому продукту')
-
-    #     if groups.filter(product=data.get('product'),
-    #                      title=data.get('title')).exists():
-    #         raise Exception('В данном продукте группа с таким названием'
-    #                         'уже существует. Придумаете новое название')
-    #     return data
-
-
     def validate(self, data):
-        # if Group.objects.filter(product=data.get('product'),
-        #                         users=data.get('users')[0]).exists():
-        #     raise Exception('Данный пользователь уже находится'
-        #                     'в другой группе по этому продукту')
         if Group.objects.filter(product=data.get('product'),
                                 title=data.get('title')).exists():
             raise Exception('В данном продукте группа с таким названием'
@@ -109,25 +93,3 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = '__all__'
-
-
-
-    #     user_id = data.get('user')
-    #     product_id = data.get('product')
-    #     if AccessUser.objects.filter(user=user_id,
-    #                                  product=product_id,
-    #                                  access=1).exists():
-    #         raise Exception('Вы уже купили данный продукт')
-
-    # #     groups = Group.objects.filter(product=product_id)
-    # #     sorted_groups = groups.annotate(num_users=Count('users')).order_by('num_users')
-    # # # Получаем количество участников в каждой группе
-    # #     num_users_per_group = [group.users.count() for group in sorted_groups]
-    # #     summa = sum(num_users_per_group)
-    # #     #НАДО РАСШИРИТЬ ВАЛИДАЦИЮ НА ТО ЧТО КОНЧИЛИСЬ МЕСТА В ГРУППАХ
-    # #     product = Product.objects.get(pk=data.get('product').id).max_users_in_group
-    # #     max_users_in_groups = product * len(num_users_per_group)
-    # #     if summa > max_users_in_groups:
-    # #         raise Exception('В группах данного продукта закончились места,'
-    # #                         'создайте еще 1 новую группу')
-    # #     return data
