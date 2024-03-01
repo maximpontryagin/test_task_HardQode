@@ -50,6 +50,47 @@ class LessonViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminUser, )
 
 
+class UserLessonsAPIView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """Выделение списка уроков по конкретному продукту
+    к которому пользователь имеет доступ."""
+
+    serializer_class = LessonSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        # Получаем id продукта из URL
+        product_id = self.kwargs['product_id']
+
+        # Получаем продукт по его id сразу загружая связанный объект автора и уроки
+        product = Product.objects.select_related('author').prefetch_related('lessons').get(id=product_id)
+
+        # Проверяем доступ пользователя к продукту
+        if not product.accessuser_set.filter(user=self.request.user, access=True).exists():
+            # Если доступа нет, возвращаем пустой queryset
+            return Lesson.objects.none()
+
+        # Получаем все уроки для указанного продукта
+        lessons = product.lessons.all()
+
+        return lessons
+
+    # def get_queryset(self):
+    #     # Получаем id продукта из URL
+    #     product_id = self.kwargs['product_id']
+
+    #     # Получаем продукт по его id
+    #     product = Product.objects.get(id=product_id)
+
+    #     # Проверяем доступ пользователя к продукту
+    #     if not product.accessuser_set.filter(user=self.request.user,
+    #                                          access=True).exists():
+    #         return Lesson.objects.none()
+    #     lessons = Lesson.objects.filter(product=product)
+    #     return lessons
+
+
+
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def buy(request):
