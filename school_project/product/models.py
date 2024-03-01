@@ -38,7 +38,7 @@ class Group(models.Model):
     product = models.ForeignKey(Product,
                                 on_delete=models.CASCADE,
                                 verbose_name='Продукт',
-                                related_name='groups')
+                                related_name='products')
     users = models.ManyToManyField(User, blank=False)
 
 

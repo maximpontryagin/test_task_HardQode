@@ -18,10 +18,9 @@ class AvailableProductsAPIView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         user = self.request.user
         products_without_access = Product.objects.exclude(
-            accessuser__user=user)
-        queryset = products_without_access.annotate(
+            accessuser__user=user).annotate(
             num_lessons=Count('lessons'))
-        return queryset
+        return products_without_access
 
 
 class UserLessonsAPIView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -32,15 +31,12 @@ class UserLessonsAPIView(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        product_id = self.kwargs['product_id']
         product = Product.objects.select_related(
-            'author').prefetch_related('lessons').get(id=product_id)
+            'author').get(id=self.kwargs['product_id'])
         if not product.accessuser_set.filter(
              user=self.request.user, access=True).exists():
             return Lesson.objects.none()
-        lessons = product.lessons.all()
-
-        return lessons
+        return product.lessons.all()
 
 
 @api_view(['POST'])
@@ -51,15 +47,13 @@ def buy(request):
     serializer = UserBuyAccessSerializer(data=request.data,
                                          context={'request': request})
     serializer.is_valid(raise_exception=True)
-    product_id = serializer.validated_data['product'].id
+    product = serializer.validated_data['product']
     user_id = request.user.id
     AccessUser.objects.create(
-        product_id=product_id,
+        product_id=product.id,
         user_id=user_id,
         access=1
     )
-
-    product = Product.objects.get(pk=product_id)
     groups = Group.objects.filter(product=product)
     sorted_groups = groups.annotate(
         num_users=Count('users')).order_by('num_users')
