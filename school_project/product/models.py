@@ -32,6 +32,9 @@ class Lesson(models.Model):
                                 on_delete=models.CASCADE,
                                 related_name='lessons')
 
+    def __str__(self):
+        return self.title
+
 
 class Group(models.Model):
     title = models.TextField(verbose_name='Название группы')
@@ -40,6 +43,9 @@ class Group(models.Model):
                                 verbose_name='Продукт',
                                 related_name='products')
     users = models.ManyToManyField(User, blank=False)
+
+    def __str__(self):
+        return self.title
 
 
 class AccessUser(models.Model):

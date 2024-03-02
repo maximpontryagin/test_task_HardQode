@@ -54,8 +54,7 @@ def buy(request):
         user_id=user_id,
         access=1
     )
-    groups = Group.objects.filter(product=product)
-    sorted_groups = groups.annotate(
+    sorted_groups = Group.objects.filter(product=product).annotate(
         num_users=Count('users')).order_by('num_users')
     num_users_per_group = [group.users.count() for group in sorted_groups]
     max_users = product.max_users_in_group
