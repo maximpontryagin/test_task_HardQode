@@ -26,6 +26,8 @@ class Product(models.Model):
 
 
 class Lesson(models.Model):
+    """Модель уроков."""
+
     title = models.TextField(verbose_name='Название')
     video_url = models.URLField(max_length=500)
     product = models.ForeignKey(Product,
@@ -37,6 +39,8 @@ class Lesson(models.Model):
 
 
 class Group(models.Model):
+    """Модель гурпп."""
+
     title = models.TextField(verbose_name='Название группы')
     product = models.ForeignKey(Product,
                                 on_delete=models.CASCADE,
@@ -49,6 +53,8 @@ class Group(models.Model):
 
 
 class AccessUser(models.Model):
+    """Модель доступа пользователей к продукту."""
+
     product = models.ForeignKey(Product,
                                 on_delete=models.CASCADE,
                                 verbose_name='Продукт')
